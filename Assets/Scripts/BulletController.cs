@@ -6,18 +6,25 @@ public class BulletController : MonoBehaviour
 {
     public float damage = 10f;
     public float speed = 10f;
-    public float toward = 1f;
+    public Vector3 targetPos;
+
+    private Vector3 toward;
 
     Collider2D border;
 
     private void Start()
     {
         border = GameObject.Find("Border").GetComponent<Collider2D>();
+        toward = (targetPos - transform.position).normalized;
+
+        Debug.Log(targetPos);
+        Debug.Log(transform.position);
+        Debug.Log(toward);
     }
 
     private void Update()
     {
-        transform.position += new Vector3(toward, 0, 0) * speed * Time.deltaTime;
+        transform.position += toward * speed * Time.deltaTime;
 
         // border check
         if(border != null )

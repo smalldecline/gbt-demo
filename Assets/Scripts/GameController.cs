@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
+
+public delegate void OnSceneLoadCallback();
 
 public class GameController : MonoBehaviour
 {
@@ -16,7 +20,8 @@ public class GameController : MonoBehaviour
     public static bool isGameInitialized = false;
 
     //游戏数据
-    
+    public float gameTime;
+
 
     private void Awake()
     {
@@ -44,6 +49,7 @@ public class GameController : MonoBehaviour
 
                 Destroy(gameObject);
             }
+            gameTime += Time.deltaTime;
         }
     }
 
@@ -61,10 +67,13 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private IEnumerable Timer()
+    public void LoadScene(string sceneName, OnSceneLoadCallback callback = null)
     {
-        
-        yield return new WaitForSeconds(1);
+        SceneManager.LoadSceneAsync(sceneName).completed += (AsyncOperation obj) =>
+        {
+            if (callback != null)
+                callback();
+        };
     }
 
     public static GameController GetInstance()

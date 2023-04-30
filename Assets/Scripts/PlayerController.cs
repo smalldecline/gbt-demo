@@ -11,9 +11,10 @@ public class PlayerController : MonoBehaviour
     [Header("UI")]
     public Canvas canvas;
     public TextMeshProUGUI textBox;
-
-    [Header("Collider")]
+    
+    [Header("Physicx")]
     public Collider2D collider;
+    public Rigidbody2D rb;
 
     //[Header("Status")]
     //public bool isOnLadder = false;
@@ -21,43 +22,54 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         // add camera to canvas
-        canvas.worldCamera = Camera.main;
+        
     }
 
     private void Update()
     {
         // update movement by axis
-        transform.position += new Vector3(Input.GetAxis("Horizontal"), 0, 0) * speed * Time.deltaTime;
-
-        // update toward
         float axis = Input.GetAxis("Horizontal");
+        rb.velocity = new Vector3 (axis * speed, 0, 0);
+        
         if (axis > 0)
         {
             transform.localScale = new Vector3(1, 1, 1);
-            canvas.gameObject.transform.localScale = new Vector3(1, 1, 1);
+            //canvas.gameObject.transform.localScale = new Vector3(1, 1, 1);
         }
         else if (axis < 0)
         {
             transform.localScale = new Vector3(-1, 1, 1);
-            canvas.gameObject.transform.localScale = new Vector3(-1, 1, 1);
+            //canvas.gameObject.transform.localScale = new Vector3(-1, 1, 1);
         }
 
         // shoot
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetMouseButtonDown(0))
         {
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = Camera.main.nearClipPlane;
+            Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
+            worldPos.z = 0;
+
             //init bullet
             GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
 
             //set bullet toward
-            bullet.GetComponent<BulletController>().toward = transform.localScale.x;
+            bullet.GetComponent<BulletController>().targetPos = worldPos;
 
         }
+    }
+
+    IEnumerator clearTextBox(int time)
+    {
+        yield return new WaitForSeconds(time);
+        textBox.text = "";
     }
 
     public void showText(string text,int time = 1)
     {
         // 这里可以用协程优化显示
         textBox.text = text;
+        StartCoroutine(clearTextBox(time));
     }
 
 }

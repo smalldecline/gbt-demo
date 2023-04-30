@@ -14,7 +14,13 @@ public class WorkbenchController : InteraciveController
             if (Input.GetKeyDown(KeyCode.E))
             {
                 Debug.Log("player pressed E");
-                
+
+                GameController gameController = GameController.GetInstance();
+
+                gameController.LoadScene("TeaGame", () =>
+                {
+                    Debug.Log("开始泡茶游戏");
+                });
             }
         }
     }
